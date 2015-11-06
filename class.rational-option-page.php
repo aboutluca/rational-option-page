@@ -621,6 +621,30 @@ class RationalOptionPages {
 					$field_value
 				);
 				break;
+				
+			/**
+			 * (types)		richtext
+			 * (required)	id, title, type
+			 * (optional)	class, media_buttons,
+			 * 				args( media_buttons )
+			 */    
+                        case 'richtext':
+				$field_class = ( isset( $field['class'] ) && !empty( $field['class'] ) ) ? $field['class'] : 'large-text code';
+				$field_value = ( isset( $this->options[ $page ][ $field['id'] ] ) ) ? $this->options[ $page ][ $field['id'] ] : ( ( isset( $field['value'] ) ) ? $field['value'] : '' );
+				$field_media = ( isset( $field['args']['media_buttons'] ) && $field['args']['media_buttons']  == true ) ? true : false;
+                                
+                      
+                                $ed_args = array(
+                                    "textarea_rows" => 5, 
+                                    "textarea_name" => $name, 
+                                    "editor_class" => $field_class,
+                                    "media_buttons" => $field_media,
+                                    "textarea_name" => '_' . $page . '_options'.'['.$field['id'].']'
+                                );
+                                wp_editor($field_value, $field['id'], $ed_args);
+                                
+                                
+				break;
 		}
 	}
 
