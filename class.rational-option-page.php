@@ -216,22 +216,50 @@ class RationalOptionPages {
 	 * @param array page Page properties
 	 */
 	private function build_page( $page ) {
+		
+		//enqueue wordpress media functionality
+		wp_enqueue_media();
+		
 		if ( $this->has_file ) {
 ?>			<script language="JavaScript">
-				jQuery( document ).ready( function() {
-					var formfield, imgurl;
+
+				//this new script use the new wordpress media upload frame, if you like it update your library.
+				//Instead of saving media url i saved media id, more useful if you want to retrieve
+				//the media image in different size
+				jQuery(document).ready(function($) {
 					
-					jQuery( '.file-upload-button ').click( function() {
-						formfield = jQuery( this ).prev( '.file-upload-text' );
-						tb_show( '', 'media-upload.php?type=file&amp;TB_iframe=true' );
-						return false;
-					} );
-					
-					window.send_to_editor = function( html ) {
-						imgurl = jQuery( 'img', html ).attr( 'src' );
-						formfield.val( imgurl );
-						tb_remove();
-					};
+                                    var file_frame,formfield;
+                                    
+                                    jQuery('.file-upload-button').on('click', function( event ){
+                                        
+                                        formfield = jQuery( this ).prev( '.file-upload-text' );
+                                 
+                                        event.preventDefault();
+                                        // If the media frame already exists, reopen it.
+                                        if ( file_frame ) {
+                                          file_frame.open();
+                                          return;
+                                        }
+                                        
+                                        // Create the media frame.
+                                        file_frame = wp.media.frames.file_frame = wp.media({
+                                          title: jQuery( this ).data( 'uploader_title' ),
+                                          button: {
+                                                text: jQuery( this ).data( 'uploader_button_text' ),
+                                          },
+                                          multiple: false  // Set to true to allow multiple files to be selected
+                                        });
+                                        
+                                        // When an image is selected, run a callback.
+                                        file_frame.on( 'select', function() {
+                                          // We set multiple to false so only get one image from the uploader
+                                          attachment = file_frame.state().get('selection').first().toJSON();
+                                          // Do something with attachment.id and/or attachment.url here
+                                          formfield.val(attachment.id); 
+                                        });
+                                        // Finally, open the modal
+                                        file_frame.open();
+                                        });
 				} );
 			</script>
 <?php	}
